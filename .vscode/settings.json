@@ -1,0 +1,4 @@
+{
+    "python.pythonPath": "/sbin/python",
+    "python.formatting.provider": "black"
+}
