@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from model import create_model, IMG_HEIGHT, IMG_WIDTH
 
-data_dir = "./chars/"
+data_dir = "./data/"
 batch_size = 32
 
 train_images = tf.keras.preprocessing.image_dataset_from_directory(
