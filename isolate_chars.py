@@ -35,25 +35,18 @@ model.load_weights("./weights/weights")
 probab_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
 
 class_names = [
-    "close-bracket",
-    "comma",
-    "invalid",
-    "left-caret",
-    "minus",
-    "open-bracket",
-    "period",
-    "plus",
-    "right-caret",
+    "]",
+    ",",
+    "",
+    "<",
+    "-",
+    "[",
+    ".",
+    "+",
+    ">",
 ]
 predictions = probab_model.predict(instructions)
 predictions = np.argmax(predictions, axis=1)
 
-import matplotlib.pyplot as plt
-
-plt.grid(False)
-plt.xticks([])
-plt.yticks([])
-
-plt.imshow(instructions[0] / 255, cmap=plt.cm.binary)
-plt.xlabel(class_names[predictions[0]])
-plt.show()
+program = "".join(class_names[i] for i in predictions)
+print(program)
