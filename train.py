@@ -26,6 +26,8 @@ test_images = tf.keras.preprocessing.image_dataset_from_directory(
     batch_size=batch_size,
 )
 
+print(train_images.class_names)
+
 model = create_model()
 
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")

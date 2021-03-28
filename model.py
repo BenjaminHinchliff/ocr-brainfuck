@@ -9,7 +9,7 @@ def create_model():
     return tf.keras.Sequential(
         [
             layers.experimental.preprocessing.Rescaling(1.0 / 255),
-            layers.Flatten(input_shape=(IMG_WIDTH, IMG_HEIGHT)),
+            layers.Flatten(input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
             layers.Dense(units=300, activation="elu"),
             layers.Dropout(0.5),
             layers.Dense(units=300, activation="elu"),

@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from model import create_model
+from model import create_model, IMG_WIDTH, IMG_HEIGHT
 import tensorflow as tf
 
 img = cv2.imread("raw/EPSON009.JPG")
@@ -15,31 +15,45 @@ _, bw = cv2.threshold(grey, 0.0, 255.0, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
 
 (contours, h) = cv2.findContours(bw, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-instructions = []
+instructions = {}
 rect_img = img.copy()
 for contour in contours:
     x, y, w, h = cv2.boundingRect(contour)
     if w < 5 or h < 5:
         continue
     cv2.rectangle(rect_img, (x, y), (x + w, y + h), color=(255, 0, 255), thickness=1)
-    instructions.append((x, img[y:y+h, x:x+w]))
-
-instructions.sort(key=lambda v: v[0])
-instructions = [*map(lambda v: v[1], instructions)]
-
-for i, ins in enumerate(instructions):
-    cv2.imwrite(f"thing/{i}.jpg", ins)
+    resized = cv2.resize(img[y : y + h, x : x + w], (IMG_WIDTH, IMG_HEIGHT))
+    instructions[x] = resized
 
 cv2.imwrite("test-2.jpg", rect_img)
+
+instructions = np.array(list(map(lambda kv: kv[1], sorted(instructions.items(), key=lambda kv: kv[0]))))
 
 model = create_model()
 model.load_weights("./weights/weights")
 
 probab_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
 
-inputs = np.array(instructions)
-print(inputs.shape)
+class_names = [
+    "close-bracket",
+    "comma",
+    "invalid",
+    "left-caret",
+    "minus",
+    "open-bracket",
+    "period",
+    "plus",
+    "right-caret",
+]
+predictions = probab_model.predict(instructions)
+predictions = np.argmax(predictions, axis=1)
 
-predictions = probab_model.predict(inputs)
+import matplotlib.pyplot as plt
 
-print(inputs, predictions)
+plt.grid(False)
+plt.xticks([])
+plt.yticks([])
+
+plt.imshow(instructions[0] / 255, cmap=plt.cm.binary)
+plt.xlabel(class_names[predictions[0]])
+plt.show()
